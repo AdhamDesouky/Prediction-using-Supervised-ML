@@ -1,0 +1,61 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pylab as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_percentage_error
+
+# Reading the CSV data file containing two variables: "Score" and "No. of Hours".
+Data=pd.read_csv(r"/content/Students Data.csv")
+# Displaying data information, description, and a scatter plot.
+print("Initial data exploration:")
+print("\nThe Data:\n", Data.to_string(), '\n', "\nTop 5 Rows:\n", Data.head(), '\n', "\nData Info:\n", Data.info(), '\n',
+      "\nData Description:\n", Data.describe(), '\n')
+
+plt.style.use('dark_background')
+plt.scatter(Data.Hours, Data.Scores)
+plt.xlabel('Hours')
+plt.ylabel('Scores')
+plt.title('Students Data')
+plt.show()
+
+# Separating the data into independent and dependent variables.
+x = Data[['Hours']].to_numpy()
+y = Data['Scores'].to_numpy()
+
+# Splitting the data into training and testing sets.
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+# Creating a Linear Regression model and fitting it with the training data.
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predicting scores using the model.
+y_pred = model.predict(X_test)
+
+# Creating a DataFrame to compare actual and predicted values.
+Evaluation = pd.DataFrame({'Actual Values': y_test, 'Predicted Values': y_pred})
+print('\nEvaluation Results:\n', Evaluation, '\n')
+
+# Calculating and displaying the Mean Absolute Percentage Error (MAPE).
+mape = mean_absolute_percentage_error(y_test, y_pred)
+print('Mean Absolute Percentage Error (MAPE) in percentage: {:.1f}%'.format(mape * 100))
+
+# Calculating and displaying the R-squared scores for training and testing sets.
+print('R-squared score (training): {:.3f}'.format(model.score(X_train, y_train)))
+print('R-squared score (test): {:.3f}'.format(model.score(X_test, y_test)))
+
+# Visualizing the data and the linear regression model.
+plt.style.use('dark_background')
+plt.scatter(x, y)
+plt.plot(x, model.predict(x), color='red')
+plt.xlabel('Hours')
+plt.ylabel('Scores')
+plt.title('Actual Values and Linear Model')
+plt.show()
+
+# Predicting the score for a given number of hours (9.25 hours per day).
+given_hours = 9.25
+given_hours = np.array(given_hours).reshape(-1, 1)
+predicted_score = model.predict(given_hours)
+print("\nPredicted Score for 9.25 hours per day:", predicted_score)
